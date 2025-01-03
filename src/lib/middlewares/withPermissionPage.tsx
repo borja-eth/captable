@@ -33,6 +33,7 @@ export const withPermissionPage =
                     unauthorizedPageUrl || "/unauthorized",
                     RedirectType.replace,
                 );
+                return Component(props)
 
             const user = await getLoggedUser();
 
