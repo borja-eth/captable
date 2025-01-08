@@ -1,5 +1,5 @@
 export const Routes = {
-    HOME: "/",
+    HOME: "/home",
     AUTH: {
         LOGIN: "/login",
     },
@@ -20,4 +20,16 @@ export const Routes = {
             },
         },
     },
-};
+    COMPANIES: {
+        INDEX: "/companies",
+        NEW: "/companies/new",
+        DETAIL: (id: string) => `/companies/${id}`,
+        EDIT: (id: string) => `/companies/${id}/edit`,
+        ROUNDS: {
+            LIST: (companyId: string) => `/companies/${companyId}/rounds`,
+            NEW: (companyId: string) => `/companies/${companyId}/rounds/new`,
+            DETAIL: (companyId: string, roundId: string) => `/companies/${companyId}/rounds/${roundId}`,
+            EDIT: (companyId: string, roundId: string) => `/companies/${companyId}/rounds/${roundId}/edit`,
+        },
+    },
+} as const;

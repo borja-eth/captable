@@ -27,16 +27,28 @@ const data = {
             isActive: true,
             items: [
                 {
-                    title: "History",
-                    url: "#",
+                    title: "Home",
+                    url: Routes.HOME,
                 },
                 {
-                    title: "Realtime",
-                    url: "#",
+                    title: "Companies",
+                    url: Routes.COMPANIES.INDEX,
                 },
                 {
-                    title: "Evolution",
-                    url: "#",
+                    title: "Rounds",
+                    url: "/rounds",
+                },
+                {
+                    title: "Investors",
+                    url: "/investors",
+                },
+                {
+                    title: "Instruments",
+                    url: "/instruments",
+                },
+                {
+                    title: "Cap Table",
+                    url: "/captable",
                 },
             ],
         },

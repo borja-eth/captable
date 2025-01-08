@@ -33,11 +33,10 @@ export const withPermissionPage =
                     unauthorizedPageUrl || "/unauthorized",
                     RedirectType.replace,
                 );
-                return Component(props)
-
+// Aca va lo de return Component(props)
             const user = await getLoggedUser();
 
-            if (!user.id) {
+            if (!user?.id) {
                 return kick();
             }
 
@@ -60,7 +59,6 @@ export const withPermissionPage =
                 return kick();
             }
 
-            // TODO: Check organization permission for operation
             return Component(props);
         } catch (e) {
             console.error(e);

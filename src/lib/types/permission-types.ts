@@ -53,6 +53,33 @@ export enum Permissions {
     PERMISSION_CREATE = "permission:create",
     PERMISSION_UPDATE = "permission:update",
     PERMISSION_DELETE = "permission:delete",
+
+    // Company permissions
+    COMPANY_LIST = "company:list",
+    COMPANY_READ = "company:read",
+    COMPANY_CREATE = "company:create",
+    COMPANY_UPDATE = "company:update",
+    COMPANY_DELETE = "company:delete",
+
+    // Round permissions
+    ROUND_LIST = "round:list",
+    ROUND_READ = "round:read",
+    ROUND_CREATE = "round:create",
+    ROUND_UPDATE = "round:update",
+    ROUND_DELETE = "round:delete",
+
+    // Instrument permissions
+    INSTRUMENT_READ = "instrument:read",
+    INSTRUMENT_CREATE = "instrument:create",
+    INSTRUMENT_UPDATE = "instrument:update",
+    INSTRUMENT_DELETE = "instrument:delete",
+
+    // Investor permissions
+    INVESTOR_LIST = "investor:list",
+    INVESTOR_READ = "investor:read",
+    INVESTOR_CREATE = "investor:create",
+    INVESTOR_UPDATE = "investor:update",
+    INVESTOR_DELETE = "investor:delete",
 }
 
 export const allPermissions = [
