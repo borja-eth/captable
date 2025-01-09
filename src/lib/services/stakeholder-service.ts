@@ -14,105 +14,105 @@ import type { Stakeholder } from "@/lib/types/stakeholder-types";
  * Lists all stakeholders
  */
 export const listStakeholders = async (
-  connection?: DatabaseConnection,
+    connection?: DatabaseConnection,
 ): Promise<Stakeholder[]> => {
-  try {
-    return await listStakeholdersQuery(connection);
-  } catch (error) {
-    console.error("Error listing stakeholders:", error);
-    throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
-  }
+    try {
+        return await listStakeholdersQuery(connection);
+    } catch (error) {
+        console.error("Error listing stakeholders:", error);
+        throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
+    }
 };
 
 /**
  * Lists stakeholders by company ID
  */
 export const listStakeholdersByCompany = async ({
-  companyId,
-  connection,
+    companyId,
+    connection,
 }: {
-  companyId: string;
-  connection?: DatabaseConnection;
+    companyId: string;
+    connection?: DatabaseConnection;
 }): Promise<Stakeholder[]> => {
-  try {
-    return await listStakeholdersByCompanyQuery(companyId, connection);
-  } catch (error) {
-    console.error("Error listing stakeholders by company:", error);
-    throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
-  }
+    try {
+        return await listStakeholdersByCompanyQuery(companyId, connection);
+    } catch (error) {
+        console.error("Error listing stakeholders by company:", error);
+        throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
+    }
 };
 
 /**
  * Gets a stakeholder by ID
  */
 export const getStakeholderById = async ({
-  id,
-  connection,
+    id,
+    connection,
 }: {
-  id: string;
-  connection?: DatabaseConnection;
+    id: string;
+    connection?: DatabaseConnection;
 }): Promise<Stakeholder> => {
-  const stakeholder = await getStakeholderByIdQuery(id, connection);
+    const stakeholder = await getStakeholderByIdQuery(id, connection);
 
-  if (!stakeholder) {
-    throw new ServerError(SERVER_ERRORS.NOT_FOUND);
-  }
+    if (!stakeholder) {
+        throw new ServerError(SERVER_ERRORS.NOT_FOUND);
+    }
 
-  return stakeholder;
+    return stakeholder;
 };
 
 /**
  * Creates a new stakeholder
  */
 export const createStakeholder = async ({
-  data,
-  connection,
+    data,
+    connection,
 }: {
-  data: Omit<Stakeholder, "id" | "createdAt" | "updatedAt">;
-  connection?: DatabaseConnection;
+    data: Omit<Stakeholder, "id" | "createdAt" | "updatedAt">;
+    connection?: DatabaseConnection;
 }): Promise<Stakeholder> => {
-  try {
-    return await createStakeholderQuery(data, connection);
-  } catch (error) {
-    console.error("Error creating stakeholder:", error);
-    throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
-  }
+    try {
+        return await createStakeholderQuery(data, connection);
+    } catch (error) {
+        console.error("Error creating stakeholder:", error);
+        throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
+    }
 };
 
 /**
  * Updates a stakeholder
  */
 export const updateStakeholder = async ({
-  id,
-  data,
-  connection,
+    id,
+    data,
+    connection,
 }: {
-  id: string;
-  data: Partial<Omit<Stakeholder, "id" | "createdAt" | "updatedAt">>;
-  connection?: DatabaseConnection;
+    id: string;
+    data: Partial<Omit<Stakeholder, "id" | "createdAt" | "updatedAt">>;
+    connection?: DatabaseConnection;
 }): Promise<Stakeholder> => {
-  try {
-    return await updateStakeholderQuery(id, data, connection);
-  } catch (error) {
-    console.error("Error updating stakeholder:", error);
-    throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
-  }
+    try {
+        return await updateStakeholderQuery(id, data, connection);
+    } catch (error) {
+        console.error("Error updating stakeholder:", error);
+        throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
+    }
 };
 
 /**
  * Deletes a stakeholder
  */
 export const deleteStakeholder = async ({
-  id,
-  connection,
+    id,
+    connection,
 }: {
-  id: string;
-  connection?: DatabaseConnection;
+    id: string;
+    connection?: DatabaseConnection;
 }): Promise<Stakeholder> => {
-  try {
-    return await deleteStakeholderQuery(id, connection);
-  } catch (error) {
-    console.error("Error deleting stakeholder:", error);
-    throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
-  }
-}; 
+    try {
+        return await deleteStakeholderQuery(id, connection);
+    } catch (error) {
+        console.error("Error deleting stakeholder:", error);
+        throw new ServerError(SERVER_ERRORS.DATABASE_ERROR);
+    }
+};

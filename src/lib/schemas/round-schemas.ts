@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-export const roundTypeEnum = z.enum(["PRE_SEED", "SEED", "SERIES_A", "SERIES_B", "SERIES_C", "SERIES_D"]);
+export const roundTypeEnum = z.enum([
+    "PRE_SEED",
+    "SEED",
+    "SERIES_A",
+    "SERIES_B",
+    "SERIES_C",
+    "SERIES_D",
+]);
 export const roundStatusEnum = z.enum(["DRAFT", "ACTIVE", "CLOSED"]);
 
 export const roundSchema = z.object({

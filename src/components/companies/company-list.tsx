@@ -3,19 +3,19 @@
 import { deleteCompanyAction } from "@/lib/actions/company-actions";
 import type { Company } from "@/lib/types/company-types";
 import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  useToast,
+    Button,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    useToast,
 } from "@roxom-markets/spark-ui";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -45,7 +45,8 @@ export const CompanyList = ({ companies }: CompanyListProps) => {
             console.error("Error deleting company:", error);
             toast({
                 title: "Error",
-                description: error.error?.serverError || "Failed to delete company",
+                description:
+                    error.error?.serverError || "Failed to delete company",
                 variant: "destructive",
             });
         },
@@ -72,11 +73,17 @@ export const CompanyList = ({ companies }: CompanyListProps) => {
                         {companies.map((company) => (
                             <TableRow key={company.id}>
                                 <TableCell>{company.name}</TableCell>
-                                <TableCell>{company.registrationNumber}</TableCell>
                                 <TableCell>
-                                    {new Date(company.incorporationDate).toLocaleDateString()}
+                                    {company.registrationNumber}
                                 </TableCell>
-                                <TableCell>{company.shares.toLocaleString()}</TableCell>
+                                <TableCell>
+                                    {new Date(
+                                        company.incorporationDate,
+                                    ).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>
+                                    {company.shares.toLocaleString()}
+                                </TableCell>
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -91,8 +98,12 @@ export const CompanyList = ({ companies }: CompanyListProps) => {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                                <CompanyDetailsModal 
+                                            <DropdownMenuItem
+                                                onSelect={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
+                                                <CompanyDetailsModal
                                                     company={company}
                                                     trigger={
                                                         <div className="w-full">
@@ -102,14 +113,26 @@ export const CompanyList = ({ companies }: CompanyListProps) => {
                                                 />
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <DropdownMenuItem
+                                                onSelect={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
                                                 <AddStakeholderModal
                                                     companyId={company.id}
-                                                    trigger={<div className="w-full">Add Stakeholder</div>}
+                                                    trigger={
+                                                        <div className="w-full">
+                                                            Add Stakeholder
+                                                        </div>
+                                                    }
                                                 />
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <DropdownMenuItem
+                                                onSelect={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
                                                 <ConfirmDialog
                                                     confirmText="Delete"
                                                     description={`Are you sure you want to delete ${company.name}? This action cannot be undone.`}
@@ -120,7 +143,11 @@ export const CompanyList = ({ companies }: CompanyListProps) => {
                                                             Delete Company
                                                         </div>
                                                     }
-                                                    onConfirm={() => executeDelete({ id: company.id })}
+                                                    onConfirm={() =>
+                                                        executeDelete({
+                                                            id: company.id,
+                                                        })
+                                                    }
                                                 />
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

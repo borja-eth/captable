@@ -27,9 +27,16 @@ export const CompanyDetails = ({ company }: CompanyDetailsProps) => {
 
     useEffect(() => {
         const loadStakeholders = async () => {
-            const result = await listStakeholdersByCompanyAction({ companyId: company.id });
-            
-            if (result && !result.validationErrors && !result.serverError && result.data) {
+            const result = await listStakeholdersByCompanyAction({
+                companyId: company.id,
+            });
+
+            if (
+                result &&
+                !result.validationErrors &&
+                !result.serverError &&
+                result.data
+            ) {
                 setStakeholders(result.data);
             }
         };
@@ -50,12 +57,20 @@ export const CompanyDetails = ({ company }: CompanyDetailsProps) => {
                             <span className="ml-2">{company.name}</span>
                         </div>
                         <div>
-                            <span className="font-medium">Registration Number:</span>
-                            <span className="ml-2">{company.registrationNumber}</span>
+                            <span className="font-medium">
+                                Registration Number:
+                            </span>
+                            <span className="ml-2">
+                                {company.registrationNumber}
+                            </span>
                         </div>
                         <div>
-                            <span className="font-medium">Incorporation Date:</span>
-                            <span className="ml-2">{format(company.incorporationDate, 'PP')}</span>
+                            <span className="font-medium">
+                                Incorporation Date:
+                            </span>
+                            <span className="ml-2">
+                                {format(company.incorporationDate, "PP")}
+                            </span>
                         </div>
                     </CardContent>
                 </Card>
@@ -67,11 +82,15 @@ export const CompanyDetails = ({ company }: CompanyDetailsProps) => {
                     <CardContent className="space-y-2">
                         <div>
                             <span className="font-medium">Created:</span>
-                            <span className="ml-2">{format(company.createdAt, 'PP')}</span>
+                            <span className="ml-2">
+                                {format(company.createdAt, "PP")}
+                            </span>
                         </div>
                         <div>
                             <span className="font-medium">Last Updated:</span>
-                            <span className="ml-2">{format(company.updatedAt, 'PP')}</span>
+                            <span className="ml-2">
+                                {format(company.updatedAt, "PP")}
+                            </span>
                         </div>
                     </CardContent>
                 </Card>
@@ -98,4 +117,4 @@ export const CompanyDetails = ({ company }: CompanyDetailsProps) => {
             </Tabs>
         </div>
     );
-}; 
+};

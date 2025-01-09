@@ -442,7 +442,9 @@ export const InstrumentCreateDialog = ({
                                     name="conversionCap"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Conversion Cap</FormLabel>
+                                            <FormLabel>
+                                                Conversion Cap
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
@@ -523,10 +525,18 @@ export const InstrumentCreateDialog = ({
                                                 <Input
                                                     {...field}
                                                     type="date"
-                                                    value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                                                    value={
+                                                        field.value
+                                                            ? field.value
+                                                                  .toISOString()
+                                                                  .split("T")[0]
+                                                            : ""
+                                                    }
                                                     onChange={(e) =>
                                                         field.onChange(
-                                                            new Date(e.target.value)
+                                                            new Date(
+                                                                e.target.value,
+                                                            ),
                                                         )
                                                     }
                                                 />

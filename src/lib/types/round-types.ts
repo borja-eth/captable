@@ -7,7 +7,13 @@ export interface Round {
     companyId: string;
     company?: Pick<Company, "name">;
     name: string;
-    type: "PRE_SEED" | "SEED" | "SERIES_A" | "SERIES_B" | "SERIES_C" | "SERIES_D";
+    type:
+        | "PRE_SEED"
+        | "SEED"
+        | "SERIES_A"
+        | "SERIES_B"
+        | "SERIES_C"
+        | "SERIES_D";
     preMoneyValuation: number;
     date: Date;
     status: "DRAFT" | "ACTIVE" | "CLOSED";

@@ -68,13 +68,15 @@ export const updateRoundAction = authAction
     .metadata({
         permissions: [Permissions.ROUND_UPDATE],
     })
-    .schema(z.object({
-        id: z.string(),
-        data: roundSchema.partial(),
-    }))
+    .schema(
+        z.object({
+            id: z.string(),
+            data: roundSchema.partial(),
+        }),
+    )
     .action(async ({ parsedInput }) => {
         const { id, data } = parsedInput;
-        
+
         return await updateRound(id, data);
     });
 

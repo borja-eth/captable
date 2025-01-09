@@ -2,37 +2,46 @@
 
 import { generateCapTableAction } from "@/lib/actions/captable-actions";
 import { listCompaniesAction } from "@/lib/actions/company-actions";
-import type {
-  CapTableSummary
-} from "@/lib/types/captable-types";
+import type { CapTableSummary } from "@/lib/types/captable-types";
 import type { Company } from "@/lib/types/company-types";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  useToast,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    Label,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    Switch,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+    useToast,
+    Collapsible,
+    CollapsibleTrigger,
+    CollapsibleContent,
 } from "@roxom-markets/spark-ui";
+import { FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ConvertedSharesView } from "./converted-shares-view";
+import { CaptablePDF } from "./captable-pdf";
 
 interface CapTableViewProps {
     companyId?: string;
@@ -42,58 +51,68 @@ const calculateConvertedShares = (capTable: CapTableSummary) => {
     // Get total stakeholder shares
     const stakeholderShares = capTable.stakeholders.reduce(
         (sum, stakeholder) => sum + stakeholder.shares,
-        0
+        0,
     );
 
     // Get total equity shares
     const totalEquityShares = capTable.entries.reduce(
         (sum, entry) => sum + entry.instruments.equity.shares,
-        0
+        0,
     );
 
     // Get pre-money shares (equity + stakeholder shares)
     const preMoneyShares = totalEquityShares + stakeholderShares;
 
     // Calculate converted entries
-    const convertedEntries = capTable.entries.map(entry => {
-        // Start with equity shares
-        const equityShares = entry.instruments.equity.shares;
+    const convertedEntries = capTable.entries
+        .map((entry) => {
+            // Start with equity shares
+            const equityShares = entry.instruments.equity.shares;
 
-        // Convert SAFEs
-        const safeShares = entry.instruments.safe.map(safe => {
-            if (!safe.valuationCap) return 0;
-            
-            // Calculate ownership percentage at cap
-            const ownershipAtCap = safe.invested / safe.valuationCap;
-            
-            // Calculate shares needed for this ownership
-            let shares = (ownershipAtCap * preMoneyShares) / (1 - ownershipAtCap);
-            
-            // Apply discount if any by increasing shares
-            if (safe.discountRate > 0) {
-                shares = shares * (1 / (1 - safe.discountRate / 100));
-            }
-            
-            return shares;
-        }).reduce((sum, shares) => sum + shares, 0);
+            // Convert SAFEs
+            const safeShares = entry.instruments.safe
+                .map((safe) => {
+                    if (!safe.valuationCap) return 0;
 
-        // Convert Notes
-        const noteShares = entry.instruments.convertibleNote.map(note => {
-            if (!note.valuationCap) return 0;
-            
-            const totalAmount = note.invested + note.accruedInterest;
-            const ownershipAtCap = totalAmount / note.valuationCap;
-            let shares = (ownershipAtCap * preMoneyShares) / (1 - ownershipAtCap);
-            
-            if (note.discountRate > 0) {
-                shares = shares * (1 / (1 - note.discountRate / 100));
-            }
-            
-            return shares;
-        }).reduce((sum, shares) => sum + shares, 0);
+                    // Calculate ownership percentage at cap
+                    const ownershipAtCap = safe.invested / safe.valuationCap;
 
-        return equityShares + safeShares + noteShares;
-    }).reduce((sum, shares) => sum + shares, 0);
+                    // Calculate shares needed for this ownership
+                    let shares =
+                        (ownershipAtCap * preMoneyShares) /
+                        (1 - ownershipAtCap);
+
+                    // Apply discount if any by increasing shares
+                    if (safe.discountRate > 0) {
+                        shares = shares * (1 / (1 - safe.discountRate / 100));
+                    }
+
+                    return shares;
+                })
+                .reduce((sum, shares) => sum + shares, 0);
+
+            // Convert Notes
+            const noteShares = entry.instruments.convertibleNote
+                .map((note) => {
+                    if (!note.valuationCap) return 0;
+
+                    const totalAmount = note.invested + note.accruedInterest;
+                    const ownershipAtCap = totalAmount / note.valuationCap;
+                    let shares =
+                        (ownershipAtCap * preMoneyShares) /
+                        (1 - ownershipAtCap);
+
+                    if (note.discountRate > 0) {
+                        shares = shares * (1 / (1 - note.discountRate / 100));
+                    }
+
+                    return shares;
+                })
+                .reduce((sum, shares) => sum + shares, 0);
+
+            return equityShares + safeShares + noteShares;
+        })
+        .reduce((sum, shares) => sum + shares, 0);
 
     return convertedEntries + stakeholderShares;
 };
@@ -105,7 +124,9 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
     const [companies, setCompanies] = useState<Company[]>([]);
     const [capTable, setCapTable] = useState<CapTableSummary | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [showConvertedSafes, setShowConvertedSafes] = useState(false);
+    const [showConvertedSafes, setShowConvertedSafes] = useState(true);
+    const [isPdfOpen, setIsPdfOpen] = useState(false);
+    const [isRoundsOpen, setIsRoundsOpen] = useState(true);
 
     const loadCompanies = useCallback(async () => {
         try {
@@ -171,78 +192,103 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
 
     const totalSharesWithSafes = useMemo(() => {
         if (!capTable) return 0;
-        
-        return showConvertedSafes ? calculateConvertedShares(capTable) : capTable.fullyDilutedShares;
+
+        return showConvertedSafes
+            ? calculateConvertedShares(capTable)
+            : capTable.fullyDilutedShares;
     }, [capTable, showConvertedSafes]);
 
     const dilutionPercentage = useMemo(() => {
         if (!capTable || !showConvertedSafes) return 0;
         const originalShares = capTable.totalShares;
         const newShares = calculateConvertedShares(capTable);
-        
+
         return ((newShares - originalShares) / newShares) * 100;
     }, [capTable, showConvertedSafes]);
 
     const companyValuation = useMemo(() => {
         if (!capTable) return 0;
-        
+
         if (!showConvertedSafes) {
             // Use the last round's post-money valuation
             const lastRound = capTable.rounds[capTable.rounds.length - 1];
-            
+
             return lastRound ? lastRound.postMoney : 0;
         }
-        
+
         // When SAFEs are converted, calculate the new valuation
         // Get the last round's price per share
         const lastRound = capTable.rounds[capTable.rounds.length - 1];
-        
+
         if (!lastRound) return 0;
-        
+
         const pricePerShare = lastRound.postMoney / capTable.totalShares;
-        
+
         return Math.round(pricePerShare * totalSharesWithSafes);
     }, [capTable, showConvertedSafes, totalSharesWithSafes]);
 
     return (
         <div className="space-y-8">
-            <div className="space-y-4">
-                <Select
-                    value={companyId ?? ""}
-                    onValueChange={(value) => {
-                        const params = new URLSearchParams(searchParams.toString());
-                        
-                        if (value) {
-                            params.set("companyId", value);
-                        } else {
-                            params.delete("companyId");
-                        }
-                        router.push(`/captable?${params.toString()}`);
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a company" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {companies.map((company) => (
-                            <SelectItem key={company.id} value={company.id}>
-                                {company.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            <div className="flex justify-between items-center">
+                <div className="space-y-4 flex-1">
+                    <Select
+                        value={companyId ?? ""}
+                        onValueChange={(value) => {
+                            const params = new URLSearchParams(
+                                searchParams.toString(),
+                            );
 
+                            if (value) {
+                                params.set("companyId", value);
+                            } else {
+                                params.delete("companyId");
+                            }
+                            router.push(`/captable?${params.toString()}`);
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a company" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {companies.map((company) => (
+                                <SelectItem key={company.id} value={company.id}>
+                                    {company.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {capTable && (
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                checked={showConvertedSafes}
+                                id="convert-safes"
+                                onCheckedChange={setShowConvertedSafes}
+                            />
+                            <Label htmlFor="convert-safes">
+                                Show converted SAFEs
+                            </Label>
+                        </div>
+                    )}
+                </div>
                 {capTable && (
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            checked={showConvertedSafes}
-                            id="convert-safes"
-                            onCheckedChange={setShowConvertedSafes}
-                        />
-                        <Label htmlFor="convert-safes">
-                            Show converted SAFEs
-                        </Label>
-                    </div>
+                    <Dialog open={isPdfOpen} onOpenChange={setIsPdfOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <FileText className="mr-2 h-4 w-4" />
+                                Export PDF
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-7xl h-[95vh]">
+                            <DialogHeader>
+                                <DialogTitle>Cap Table PDF</DialogTitle>
+                            </DialogHeader>
+                            <CaptablePDF
+                                capTable={capTable}
+                                showConvertedSafes={showConvertedSafes}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 )}
             </div>
 
@@ -262,7 +308,9 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
                                         Total Shares
                                     </div>
                                     <div className="text-2xl font-bold">
-                                        {(capTable.totalShares || 0).toLocaleString()}
+                                        {(
+                                            capTable.totalShares || 0
+                                        ).toLocaleString()}
                                     </div>
                                 </div>
                                 <div>
@@ -280,12 +328,16 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
                                             : "Fully Diluted Shares"}
                                     </div>
                                     <div className="text-2xl font-bold">
-                                        {Math.round(totalSharesWithSafes).toLocaleString()}
+                                        {Math.round(
+                                            totalSharesWithSafes,
+                                        ).toLocaleString()}
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-sm font-medium text-muted-foreground">
-                                        {showConvertedSafes ? "Post-Money Valuation" : "Company Valuation"}
+                                        {showConvertedSafes
+                                            ? "Post-Money Valuation"
+                                            : "Company Valuation"}
                                     </div>
                                     <div className="text-2xl font-bold">
                                         ${companyValuation.toLocaleString()}
@@ -313,37 +365,67 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
                         <CardContent>
                             <Tabs defaultValue="investors">
                                 <TabsList>
-                                    <TabsTrigger value="investors">Investors</TabsTrigger>
-                                    <TabsTrigger value="stakeholders">Stakeholders</TabsTrigger>
+                                    <TabsTrigger value="investors">
+                                        Investors
+                                    </TabsTrigger>
+                                    <TabsTrigger value="stakeholders">
+                                        Stakeholders
+                                    </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="investors">
                                     {showConvertedSafes ? (
-                                        <ConvertedSharesView capTable={capTable} />
+                                        <ConvertedSharesView
+                                            capTable={capTable}
+                                        />
                                     ) : (
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead>Investor</TableHead>
-                                                    <TableHead className="text-right">Shares</TableHead>
-                                                    <TableHead className="text-right">Ownership</TableHead>
-                                                    <TableHead className="text-right">Value</TableHead>
+                                                    <TableHead>
+                                                        Investor
+                                                    </TableHead>
+                                                    <TableHead className="text-right">
+                                                        Shares
+                                                    </TableHead>
+                                                    <TableHead className="text-right">
+                                                        Ownership
+                                                    </TableHead>
+                                                    <TableHead className="text-right">
+                                                        Value
+                                                    </TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {capTable.entries.map((entry) => (
-                                                    <TableRow key={entry.investorId}>
-                                                        <TableCell>{entry.investorName}</TableCell>
-                                                        <TableCell className="text-right">
-                                                            {Math.round(entry.shares).toLocaleString()}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {entry.ownership.toFixed(2)}%
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            ${entry.value.toLocaleString()}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
+                                                {capTable.entries.map(
+                                                    (entry) => (
+                                                        <TableRow
+                                                            key={
+                                                                entry.investorId
+                                                            }
+                                                        >
+                                                            <TableCell>
+                                                                {
+                                                                    entry.investorName
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {Math.round(
+                                                                    entry.shares,
+                                                                ).toLocaleString()}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {entry.ownership.toFixed(
+                                                                    2,
+                                                                )}
+                                                                %
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                $
+                                                                {entry.value.toLocaleString()}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )}
                                             </TableBody>
                                         </Table>
                                     )}
@@ -355,40 +437,82 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
                                                 <TableHead>Name</TableHead>
                                                 <TableHead>Role</TableHead>
                                                 <TableHead>Title</TableHead>
-                                                <TableHead className="text-right">Shares</TableHead>
-                                                <TableHead className="text-right">Ownership</TableHead>
+                                                <TableHead className="text-right">
+                                                    Shares
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Ownership
+                                                </TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {capTable.stakeholders.map((entry) => (
-                                                <TableRow key={entry.stakeholder.id}>
-                                                    <TableCell>{entry.stakeholder.name}</TableCell>
-                                                    <TableCell>{entry.stakeholder.role}</TableCell>
-                                                    <TableCell>{entry.stakeholder.title}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        {Math.round(entry.shares).toLocaleString()}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        {entry.ownership.toFixed(2)}%
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {capTable.stakeholders.map(
+                                                (entry) => (
+                                                    <TableRow
+                                                        key={
+                                                            entry.stakeholder.id
+                                                        }
+                                                    >
+                                                        <TableCell>
+                                                            {
+                                                                entry
+                                                                    .stakeholder
+                                                                    .name
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                entry
+                                                                    .stakeholder
+                                                                    .role
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                entry
+                                                                    .stakeholder
+                                                                    .title
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {Math.round(
+                                                                entry.shares,
+                                                            ).toLocaleString()}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {entry.ownership.toFixed(
+                                                                2,
+                                                            )}
+                                                            %
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )}
                                             {/* Total row */}
                                             <TableRow className="bg-muted font-bold">
                                                 <TableCell>Total</TableCell>
-                                                <TableCell></TableCell>
-                                                <TableCell></TableCell>
+                                                <TableCell />
+                                                <TableCell />
                                                 <TableCell className="text-right">
-                                                    {Math.round(capTable.stakeholders.reduce(
-                                                        (sum, entry) => sum + entry.shares,
-                                                        0
-                                                    )).toLocaleString()}
+                                                    {Math.round(
+                                                        capTable.stakeholders.reduce(
+                                                            (sum, entry) =>
+                                                                sum +
+                                                                entry.shares,
+                                                            0,
+                                                        ),
+                                                    ).toLocaleString()}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    {capTable.stakeholders.reduce(
-                                                        (sum, entry) => sum + entry.ownership,
-                                                        0
-                                                    ).toFixed(2)}%
+                                                    {capTable.stakeholders
+                                                        .reduce(
+                                                            (sum, entry) =>
+                                                                sum +
+                                                                entry.ownership,
+                                                            0,
+                                                        )
+                                                        .toFixed(2)}
+                                                    %
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -399,78 +523,59 @@ export const CapTableView = ({ companyId }: CapTableViewProps) => {
                     </Card>
 
                     {/* Rounds */}
-                    {capTable.rounds.map((round) => (
-                        <Card key={round.id}>
-                            <CardHeader>
-                                <CardTitle>{round.name}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-6">
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div>
-                                            <div className="text-sm font-medium text-muted-foreground">
-                                                Date
-                                            </div>
-                                            <div>
-                                                {new Date(round.date).toLocaleDateString()}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-medium text-muted-foreground">
-                                                Pre-Money
-                                            </div>
-                                            <div>
-                                                ${round.preMoney.toLocaleString()}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-medium text-muted-foreground">
-                                                Post-Money
-                                            </div>
-                                            <div>
-                                                ${round.postMoney.toLocaleString()}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-medium text-muted-foreground">
-                                                New Investment
-                                            </div>
-                                            <div>
-                                                ${round.newInvestment.toLocaleString()}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Investor</TableHead>
-                                                <TableHead>Shares</TableHead>
-                                                <TableHead>Ownership %</TableHead>
-                                                <TableHead>Value</TableHead>
+                    <div className="space-y-4">
+                        <Collapsible open={isRoundsOpen} onOpenChange={setIsRoundsOpen}>
+                            <div className="flex items-center gap-2">
+                                <CollapsibleTrigger asChild>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm"
+                                        className="gap-2"
+                                    >
+                                        {isRoundsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                        {isRoundsOpen ? "Hide Rounds" : "Show Rounds"}
+                                    </Button>
+                                </CollapsibleTrigger>
+                            </div>
+                            
+                            <CollapsibleContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Round</TableHead>
+                                            <TableHead className="text-right">Pre-Money</TableHead>
+                                            <TableHead className="text-right">Post-Money</TableHead>
+                                            <TableHead className="text-right">New Shares</TableHead>
+                                            <TableHead className="text-right">New Investment</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {capTable.rounds.map((round) => (
+                                            <TableRow key={round.id}>
+                                                <TableCell>
+                                                    {new Date(round.date).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell>{round.name}</TableCell>
+                                                <TableCell className="text-right">
+                                                    ${round.preMoney.toLocaleString()}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    ${round.postMoney.toLocaleString()}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {Math.round(round.newShares).toLocaleString()}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    ${round.newInvestment.toLocaleString()}
+                                                </TableCell>
                                             </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {round.entries.map((entry) => (
-                                                <TableRow key={entry.investorId}>
-                                                    <TableCell>{entry.investorName}</TableCell>
-                                                    <TableCell>
-                                                        {Math.round(entry.shares).toLocaleString()}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {entry.ownership.toFixed(2)}%
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        ${entry.value.toLocaleString()}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CollapsibleContent>
+                        </Collapsible>
+                    </div>
                 </div>
             ) : (
                 <div className="text-center py-8 text-muted-foreground">

@@ -5,7 +5,7 @@ import { stakeholders } from "@/database/schema";
 import type { Stakeholder } from "@/lib/types/stakeholder-types";
 
 export const listStakeholdersQuery = async (
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder[]> => {
     return await connection.query.stakeholders.findMany({
         orderBy: stakeholders.name,
@@ -14,7 +14,7 @@ export const listStakeholdersQuery = async (
 
 export const listStakeholdersByCompanyQuery = async (
     companyId: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder[]> => {
     const results = await connection.query.stakeholders.findMany({
         where: eq(stakeholders.companyId, companyId),
@@ -26,7 +26,7 @@ export const listStakeholdersByCompanyQuery = async (
 
 export const getStakeholderByIdQuery = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder | undefined> => {
     const result = await connection.query.stakeholders.findFirst({
         where: eq(stakeholders.id, id),
@@ -37,7 +37,7 @@ export const getStakeholderByIdQuery = async (
 
 export const createStakeholderQuery = async (
     stakeholder: Omit<Stakeholder, "id" | "createdAt" | "updatedAt">,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder> => {
     const [result] = await connection
         .insert(stakeholders)
@@ -50,7 +50,7 @@ export const createStakeholderQuery = async (
 export const updateStakeholderQuery = async (
     id: string,
     stakeholder: Partial<Omit<Stakeholder, "id" | "createdAt" | "updatedAt">>,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder> => {
     const [result] = await connection
         .update(stakeholders)
@@ -66,7 +66,7 @@ export const updateStakeholderQuery = async (
 
 export const deleteStakeholderQuery = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Stakeholder> => {
     const [result] = await connection
         .delete(stakeholders)
@@ -74,4 +74,4 @@ export const deleteStakeholderQuery = async (
         .returning();
 
     return result;
-}; 
+};

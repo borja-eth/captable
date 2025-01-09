@@ -50,6 +50,10 @@ const data = {
                     title: "Cap Table",
                     url: "/captable",
                 },
+                {
+                    title: "Scenarios",
+                    url: "/scenarios",
+                },
             ],
         },
         {

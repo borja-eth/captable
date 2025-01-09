@@ -7,7 +7,9 @@ const RoundsPage = () => {
     return (
         <div className="container mx-auto py-8 space-y-8">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Funding Rounds</h1>
+                <h1 className="text-3xl font-bold tracking-tight">
+                    Funding Rounds
+                </h1>
                 <AddRoundModal />
             </div>
             <RoundList />
@@ -17,4 +19,4 @@ const RoundsPage = () => {
 
 export default withPermissionPage(RoundsPage, {
     permissions: [Permissions.ROUND_LIST, Permissions.ROUND_CREATE],
-}); 
+});

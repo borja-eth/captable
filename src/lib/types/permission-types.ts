@@ -87,6 +87,15 @@ export enum Permissions {
     STAKEHOLDER_CREATE = "stakeholder:create",
     STAKEHOLDER_UPDATE = "stakeholder:update",
     STAKEHOLDER_DELETE = "stakeholder:delete",
+
+    // Scenario permissions
+    SCENARIO_LIST = "scenario:list",
+    SCENARIO_READ = "scenario:read",
+    SCENARIO_CREATE = "scenario:create",
+    SCENARIO_UPDATE = "scenario:update",
+    SCENARIO_DELETE = "scenario:delete",
+    SCENARIO_MANAGE = "scenario:manage",
+    SCENARIO_VIEW = "scenario:view",
 }
 
 export const allPermissions = [

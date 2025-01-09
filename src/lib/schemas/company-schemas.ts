@@ -6,7 +6,8 @@ export const companySchema = z.object({
     incorporationDate: z.date({
         required_error: "Incorporation date is required",
     }),
-    shares: z.number()
+    shares: z
+        .number()
         .int("Number of shares must be a whole number")
         .min(1, "Number of shares must be at least 1")
         .default(10000000),

@@ -282,7 +282,8 @@ export const generateCapTable = async ({
     const stakeholderEntries = stakeholders.map((stakeholder) => ({
         stakeholder,
         shares: stakeholder.sharesGranted,
-        ownership: (stakeholder.sharesGranted / totalSharesWithStakeholders) * 100,
+        ownership:
+            (stakeholder.sharesGranted / totalSharesWithStakeholders) * 100,
     }));
 
     // Recalculate ownership percentages for round entries

@@ -15,7 +15,9 @@ import type { DatabaseConnection } from "@/database";
 /**
  * Lists all rounds
  */
-export const listRounds = async (connection: DatabaseConnection = db): Promise<Round[]> => {
+export const listRounds = async (
+    connection: DatabaseConnection = db,
+): Promise<Round[]> => {
     try {
         return await listRoundsQuery(connection);
     } catch (error) {
@@ -28,7 +30,7 @@ export const listRounds = async (connection: DatabaseConnection = db): Promise<R
  */
 export const listRoundsByCompany = async (
     companyId: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round[]> => {
     try {
         return await listRoundsByCompanyQuery(companyId, connection);
@@ -42,15 +44,15 @@ export const listRoundsByCompany = async (
  */
 export const getRoundById = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     try {
         const round = await getRoundByIdQuery(id, connection);
-        
+
         if (!round) {
             throw new ServerError(SERVER_ERRORS.NOT_FOUND);
         }
-        
+
         return round;
     } catch (error) {
         if (error instanceof ServerError) throw error;
@@ -63,7 +65,7 @@ export const getRoundById = async (
  */
 export const createRound = async (
     data: Omit<Round, "id" | "createdAt" | "updatedAt">,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     try {
         return await createRoundQuery(data, connection);
@@ -78,17 +80,15 @@ export const createRound = async (
 export const updateRound = async (
     id: string,
     data: Partial<Omit<Round, "id" | "createdAt" | "updatedAt">>,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
-    
     try {
         const exists = await doesRoundExistQuery(id, connection);
-        
-        
+
         if (!exists) {
             throw new ServerError(SERVER_ERRORS.NOT_FOUND);
         }
-        
+
         return await updateRoundQuery(id, data, connection);
     } catch (error) {
         if (error instanceof ServerError) throw error;
@@ -101,17 +101,16 @@ export const updateRound = async (
  */
 export const deleteRound = async (
     id: string,
-    
-    connection: DatabaseConnection = db
+
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     try {
-        
         const exists = await doesRoundExistQuery(id, connection);
-        
+
         if (!exists) {
             throw new ServerError(SERVER_ERRORS.NOT_FOUND);
         }
-        
+
         return await deleteRoundQuery(id, connection);
     } catch (error) {
         if (error instanceof ServerError) throw error;

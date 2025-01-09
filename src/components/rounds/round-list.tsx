@@ -1,6 +1,9 @@
 "use client";
 
-import { deleteRoundAction, listRoundsAction } from "@/lib/actions/round-actions";
+import {
+    deleteRoundAction,
+    listRoundsAction,
+} from "@/lib/actions/round-actions";
 import type { Round } from "@/lib/types/round-types";
 import {
     Button,
@@ -29,9 +32,13 @@ export const RoundList = () => {
     const loadRounds = async () => {
         try {
             const result = await listRoundsAction();
-            
-            if (result && !result.validationErrors && !result.serverError && result.data) {
 
+            if (
+                result &&
+                !result.validationErrors &&
+                !result.serverError &&
+                result.data
+            ) {
                 setRounds(result.data);
             }
         } catch (error) {
@@ -63,7 +70,8 @@ export const RoundList = () => {
             console.error("Error deleting round:", error);
             toast({
                 title: "Error",
-                description: error.error?.serverError || "Failed to delete round",
+                description:
+                    error.error?.serverError || "Failed to delete round",
                 variant: "destructive",
             });
         },
@@ -93,7 +101,9 @@ export const RoundList = () => {
                     <TableHead>Round Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Pre-Money Valuation</TableHead>
+                    <TableHead className="text-right">
+                        Pre-Money Valuation
+                    </TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
@@ -101,10 +111,15 @@ export const RoundList = () => {
             <TableBody>
                 {rounds.map((round) => (
                     <TableRow key={round.id}>
-                        <TableCell>{round.company?.name || `Company ${round.companyId}`}</TableCell>
+                        <TableCell>
+                            {round.company?.name ||
+                                `Company ${round.companyId}`}
+                        </TableCell>
                         <TableCell>{round.name}</TableCell>
                         <TableCell>{round.type.replace("_", " ")}</TableCell>
-                        <TableCell>{new Date(round.date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                            {new Date(round.date).toLocaleDateString()}
+                        </TableCell>
                         <TableCell className="text-right">
                             ${round.preMoneyValuation.toLocaleString()}
                         </TableCell>
@@ -123,18 +138,22 @@ export const RoundList = () => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
                                         <ConfirmDialog
-                                            title="Delete Round"
-                                            description={`Are you sure you want to delete ${round.name}? This action cannot be undone.`}
                                             confirmText="Delete"
+                                            description={`Are you sure you want to delete ${round.name}? This action cannot be undone.`}
+                                            title="Delete Round"
                                             trigger={
                                                 <div className="w-full flex items-center text-destructive">
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     Delete Round
                                                 </div>
                                             }
-                                            onConfirm={() => executeDelete({ id: round.id })}
+                                            onConfirm={() =>
+                                                executeDelete({ id: round.id })
+                                            }
                                         />
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

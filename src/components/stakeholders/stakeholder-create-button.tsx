@@ -3,9 +3,11 @@
 import { AddStakeholderModal } from "./add-stakeholder-modal";
 
 interface StakeholderCreateButtonProps {
-  companyId: string;
+    companyId: string;
 }
 
-export const StakeholderCreateButton = ({ companyId }: StakeholderCreateButtonProps) => {
-  return <AddStakeholderModal companyId={companyId} />;
-}; 
+export const StakeholderCreateButton = ({
+    companyId,
+}: StakeholderCreateButtonProps) => {
+    return <AddStakeholderModal companyId={companyId} />;
+};

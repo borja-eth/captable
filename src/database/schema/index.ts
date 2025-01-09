@@ -5,3 +5,4 @@ export * from "./rounds";
 export * from "./instruments";
 export * from "./stakeholders";
 export * from "./option-pools";
+export * from "./scenarios";

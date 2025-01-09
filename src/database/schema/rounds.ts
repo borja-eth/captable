@@ -10,7 +10,14 @@ export const rounds = pgTable("rounds", {
     name: text("name").notNull(),
     type: text("type")
         .notNull()
-        .$type<"PRE_SEED" | "SEED" | "SERIES_A" | "SERIES_B" | "SERIES_C" | "SERIES_D">(),
+        .$type<
+            | "PRE_SEED"
+            | "SEED"
+            | "SERIES_A"
+            | "SERIES_B"
+            | "SERIES_C"
+            | "SERIES_D"
+        >(),
     preMoneyValuation: numeric("pre_money_valuation").notNull(),
     date: timestamp("date").notNull(),
     status: text("status")

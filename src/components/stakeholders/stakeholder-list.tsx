@@ -14,7 +14,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-    useToast
+    useToast,
 } from "@roxom-markets/spark-ui";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -42,7 +42,8 @@ export const StakeholderList = ({ stakeholders }: StakeholderListProps) => {
             console.error("Error deleting stakeholder:", error);
             toast({
                 title: "Error",
-                description: error.error?.serverError || "Failed to delete stakeholder",
+                description:
+                    error.error?.serverError || "Failed to delete stakeholder",
                 variant: "destructive",
             });
         },
@@ -92,18 +93,24 @@ export const StakeholderList = ({ stakeholders }: StakeholderListProps) => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
                                         <ConfirmDialog
-                                            title="Delete Stakeholder"
-                                            description={`Are you sure you want to delete ${stakeholder.name}? This action cannot be undone.`}
                                             confirmText="Delete"
+                                            description={`Are you sure you want to delete ${stakeholder.name}? This action cannot be undone.`}
+                                            title="Delete Stakeholder"
                                             trigger={
                                                 <div className="w-full flex items-center text-destructive">
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     Delete Stakeholder
                                                 </div>
                                             }
-                                            onConfirm={() => executeDelete({ id: stakeholder.id })}
+                                            onConfirm={() =>
+                                                executeDelete({
+                                                    id: stakeholder.id,
+                                                })
+                                            }
                                         />
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -114,4 +121,4 @@ export const StakeholderList = ({ stakeholders }: StakeholderListProps) => {
             </TableBody>
         </Table>
     );
-}; 
+};

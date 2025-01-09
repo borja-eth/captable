@@ -15,7 +15,9 @@ const mapRound = (result: typeof rounds.$inferSelect): Round => ({
 /**
  * Retrieves all rounds from the database
  */
-export const listRoundsQuery = async (connection: DatabaseConnection = db): Promise<Round[]> => {
+export const listRoundsQuery = async (
+    connection: DatabaseConnection = db,
+): Promise<Round[]> => {
     const results = await connection.query.rounds.findMany({
         with: {
             company: {
@@ -35,7 +37,7 @@ export const listRoundsQuery = async (connection: DatabaseConnection = db): Prom
  */
 export const listRoundsByCompanyQuery = async (
     companyId: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round[]> => {
     const results = await connection.query.rounds.findMany({
         where: eq(rounds.companyId, companyId),
@@ -50,7 +52,7 @@ export const listRoundsByCompanyQuery = async (
  */
 export const getRoundByIdQuery = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round | null> => {
     const result = await connection.query.rounds.findFirst({
         where: eq(rounds.id, id),
@@ -64,7 +66,7 @@ export const getRoundByIdQuery = async (
  */
 export const createRoundQuery = async (
     data: Omit<Round, "id" | "createdAt" | "updatedAt">,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     const [result] = await connection
         .insert(rounds)
@@ -83,7 +85,7 @@ export const createRoundQuery = async (
 export const updateRoundQuery = async (
     id: string,
     data: Partial<Omit<Round, "id" | "createdAt" | "updatedAt">>,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     const [result] = await connection
         .update(rounds)
@@ -102,7 +104,7 @@ export const updateRoundQuery = async (
  */
 export const deleteRoundQuery = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round> => {
     const [result] = await connection
         .delete(rounds)
@@ -117,7 +119,7 @@ export const deleteRoundQuery = async (
  */
 export const doesRoundExistQuery = async (
     id: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<boolean> => {
     const round = await connection.query.rounds.findFirst({
         where: eq(rounds.id, id),
@@ -134,7 +136,7 @@ export const doesRoundExistQuery = async (
  */
 export const getLatestActiveRoundQuery = async (
     companyId: string,
-    connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Round | null> => {
     const result = await connection.query.rounds.findFirst({
         where: eq(rounds.companyId, companyId),

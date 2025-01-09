@@ -54,11 +54,12 @@ export const CompanyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         },
         onError: (error) => {
             console.error("Error creating company:", error);
-            const errorMessage = error.error?.serverError === SERVER_ERRORS.ALREADY_EXISTS
-                ? "A company with this registration number already exists"
-                : error.error?.serverError === SERVER_ERRORS.DATABASE_ERROR
-                ? "Failed to create company due to a database error"
-                : "Something went wrong";
+            const errorMessage =
+                error.error?.serverError === SERVER_ERRORS.ALREADY_EXISTS
+                    ? "A company with this registration number already exists"
+                    : error.error?.serverError === SERVER_ERRORS.DATABASE_ERROR
+                      ? "Failed to create company due to a database error"
+                      : "Something went wrong";
 
             toast({
                 title: "Error",
@@ -122,10 +123,10 @@ export const CompanyForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                         <FormItem>
                             <FormLabel>Authorized Shares</FormLabel>
                             <FormControl>
-                                <Input 
-                                    type="number" 
+                                <Input
                                     min={1}
                                     step={1}
+                                    type="number"
                                     {...field}
                                     value={value || ""}
                                     onChange={(e) => {

@@ -1,7 +1,11 @@
 "use client";
 
 import { createRoundAction } from "@/lib/actions/round-actions";
-import { roundSchema, roundTypeEnum, roundStatusEnum } from "@/lib/schemas/round-schemas";
+import {
+    roundSchema,
+    roundTypeEnum,
+    roundStatusEnum,
+} from "@/lib/schemas/round-schemas";
 import { SERVER_ERRORS } from "@/lib/types/server-error";
 import {
     Button,
@@ -40,7 +44,9 @@ const ROUND_STATUS = roundStatusEnum.options;
 
 export const AddRoundModal = () => {
     const [open, setOpen] = useState(false);
-    const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
+    const [companies, setCompanies] = useState<{ id: string; name: string }[]>(
+        [],
+    );
     const router = useRouter();
     const { toast } = useToast();
 
@@ -69,11 +75,12 @@ export const AddRoundModal = () => {
         },
         onError: (error) => {
             console.error("Error creating round:", error);
-            const errorMessage = error.error?.serverError === SERVER_ERRORS.UNAUTHORIZED
-                ? "You are not authorized to create rounds"
-                : error.error?.serverError === SERVER_ERRORS.DATABASE_ERROR
-                ? "Failed to create round due to a database error"
-                : "Something went wrong";
+            const errorMessage =
+                error.error?.serverError === SERVER_ERRORS.UNAUTHORIZED
+                    ? "You are not authorized to create rounds"
+                    : error.error?.serverError === SERVER_ERRORS.DATABASE_ERROR
+                      ? "Failed to create round due to a database error"
+                      : "Something went wrong";
 
             toast({
                 title: "Error",
@@ -86,9 +93,13 @@ export const AddRoundModal = () => {
     const loadCompanies = async () => {
         try {
             const result = await listCompaniesAction();
-            
-            if (result && !result.validationErrors && !result.serverError && result.data) {
 
+            if (
+                result &&
+                !result.validationErrors &&
+                !result.serverError &&
+                result.data
+            ) {
                 setCompanies(result.data);
             }
         } catch (error) {
@@ -103,9 +114,8 @@ export const AddRoundModal = () => {
 
     const onSubmit = form.handleSubmit(async (data) => {
         console.log("Form data being submitted:", data);
-        
-        try {
 
+        try {
             await execute(data);
         } catch (error) {
             console.error("Form submission error:", error);
@@ -113,14 +123,16 @@ export const AddRoundModal = () => {
     });
 
     return (
-        <Dialog open={open} onOpenChange={(newOpen) => {
-            setOpen(newOpen);
-            
-            if (newOpen) {
+        <Dialog
+            open={open}
+            onOpenChange={(newOpen) => {
+                setOpen(newOpen);
 
-                loadCompanies();
-            }
-        }}>
+                if (newOpen) {
+                    loadCompanies();
+                }
+            }}
+        >
             <DialogTrigger asChild>
                 <Button>
                     <Plus className="mr-2 size-4" />
@@ -132,7 +144,7 @@ export const AddRoundModal = () => {
                     <DialogTitle>Add Funding Round</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={onSubmit} className="space-y-4">
+                    <form className="space-y-4" onSubmit={onSubmit}>
                         <FormField
                             control={form.control}
                             name="companyId"
@@ -140,8 +152,8 @@ export const AddRoundModal = () => {
                                 <FormItem>
                                     <FormLabel>Company</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
                                         defaultValue={field.value}
+                                        onValueChange={field.onChange}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
@@ -150,7 +162,10 @@ export const AddRoundModal = () => {
                                         </FormControl>
                                         <SelectContent>
                                             {companies.map((company) => (
-                                                <SelectItem key={company.id} value={company.id}>
+                                                <SelectItem
+                                                    key={company.id}
+                                                    value={company.id}
+                                                >
                                                     {company.name}
                                                 </SelectItem>
                                             ))}
@@ -167,7 +182,10 @@ export const AddRoundModal = () => {
                                 <FormItem>
                                     <FormLabel>Round Name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} placeholder="Series A" />
+                                        <Input
+                                            {...field}
+                                            placeholder="Series A"
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -180,8 +198,8 @@ export const AddRoundModal = () => {
                                 <FormItem>
                                     <FormLabel>Round Type</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
                                         defaultValue={field.value}
+                                        onValueChange={field.onChange}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
@@ -190,7 +208,10 @@ export const AddRoundModal = () => {
                                         </FormControl>
                                         <SelectContent>
                                             {ROUND_TYPES.map((type) => (
-                                                <SelectItem key={type} value={type}>
+                                                <SelectItem
+                                                    key={type}
+                                                    value={type}
+                                                >
                                                     {type.replace("_", " ")}
                                                 </SelectItem>
                                             ))}
@@ -203,19 +224,25 @@ export const AddRoundModal = () => {
                         <FormField
                             control={form.control}
                             name="preMoneyValuation"
-                            render={({ field: { onChange, value, ...field } }) => (
+                            render={({
+                                field: { onChange, value, ...field },
+                            }) => (
                                 <FormItem>
                                     <FormLabel>Pre-Money Valuation</FormLabel>
                                     <FormControl>
                                         <Input
-                                            type="number"
                                             min={0}
                                             step={1}
+                                            type="number"
                                             {...field}
                                             value={value || ""}
                                             onChange={(e) => {
-                                                const value = parseInt(e.target.value);
-                                                onChange(isNaN(value) ? 0 : value);
+                                                const value = parseInt(
+                                                    e.target.value,
+                                                );
+                                                onChange(
+                                                    isNaN(value) ? 0 : value,
+                                                );
                                             }}
                                         />
                                     </FormControl>
@@ -232,8 +259,22 @@ export const AddRoundModal = () => {
                                     <FormControl>
                                         <Input
                                             type="date"
-                                            value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                          .toISOString()
+                                                          .split("T")[0]
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                field.onChange(
+                                                    e.target.value
+                                                        ? new Date(
+                                                              e.target.value,
+                                                          )
+                                                        : null,
+                                                )
+                                            }
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -247,8 +288,8 @@ export const AddRoundModal = () => {
                                 <FormItem>
                                     <FormLabel>Status</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
                                         defaultValue={field.value}
+                                        onValueChange={field.onChange}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
@@ -257,7 +298,10 @@ export const AddRoundModal = () => {
                                         </FormControl>
                                         <SelectContent>
                                             {ROUND_STATUS.map((status) => (
-                                                <SelectItem key={status} value={status}>
+                                                <SelectItem
+                                                    key={status}
+                                                    value={status}
+                                                >
                                                     {status}
                                                 </SelectItem>
                                             ))}
@@ -268,10 +312,16 @@ export const AddRoundModal = () => {
                             )}
                         />
                         <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={() => setOpen(false)}>
+                            <Button
+                                variant="outline"
+                                onClick={() => setOpen(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={status === "executing"}>
+                            <Button
+                                disabled={status === "executing"}
+                                type="submit"
+                            >
                                 Create
                             </Button>
                         </div>

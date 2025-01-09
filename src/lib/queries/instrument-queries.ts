@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/database";
-import { instruments } from "@/database/schema";
+import { instruments, rounds } from "@/database/schema";
 import type { DatabaseConnection } from "@/database";
 import type {
     Instrument,
@@ -307,4 +307,19 @@ export const doesInstrumentExistQuery = async ({
     });
 
     return !!instrument;
+};
+
+export const listInstrumentsByCompanyQuery = async (
+    companyId: string,
+    connection: DatabaseConnection = db,
+) => {
+    const results = await connection
+        .select({
+            instrument: instruments,
+        })
+        .from(instruments)
+        .innerJoin(rounds, eq(instruments.roundId, rounds.id))
+        .where(eq(rounds.companyId, companyId));
+
+    return results.map(r => r.instrument);
 };

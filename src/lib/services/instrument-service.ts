@@ -12,6 +12,7 @@ import {
     listInstrumentsByRoundQuery,
     listInstrumentsByInvestorQuery,
     updateInstrumentQuery,
+    listInstrumentsByCompanyQuery,
 } from "@/lib/queries/instrument-queries";
 import type { DatabaseConnection } from "@/database";
 
@@ -166,5 +167,16 @@ export const deleteInstrument = async ({
         return await deleteInstrumentQuery({ id, connection });
     } catch (error) {
         throw new ServerError(SERVER_ERRORS.UNHANDLED_ERROR);
+    }
+};
+
+/**
+ * Lists all instruments for a company
+ */
+export const listInstrumentsByCompany = async ({ companyId }: { companyId: string }) => {
+    try {
+        return await listInstrumentsByCompanyQuery(companyId);
+    } catch (error) {
+        throw new Error("Failed to list instruments by company");
     }
 };

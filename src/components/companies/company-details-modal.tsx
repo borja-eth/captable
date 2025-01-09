@@ -17,14 +17,17 @@ interface CompanyDetailsModalProps {
     trigger?: React.ReactNode;
 }
 
-export const CompanyDetailsModal = ({ company, trigger }: CompanyDetailsModalProps) => {
+export const CompanyDetailsModal = ({
+    company,
+    trigger,
+}: CompanyDetailsModalProps) => {
     const [open, setOpen] = useState(false);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button className="w-full justify-start" variant="ghost">
                         View Details
                     </Button>
                 )}
@@ -37,4 +40,4 @@ export const CompanyDetailsModal = ({ company, trigger }: CompanyDetailsModalPro
             </DialogContent>
         </Dialog>
     );
-}; 
+};
