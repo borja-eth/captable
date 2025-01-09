@@ -1,81 +1,148 @@
 "use client";
 
-import { Round } from "@/lib/types/round-types";
-import { Routes } from "@/routes";
-import { 
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger 
+import { deleteRoundAction, listRoundsAction } from "@/lib/actions/round-actions";
+import type { Round } from "@/lib/types/round-types";
+import {
+    Button,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+    useToast,
 } from "@roxom-markets/spark-ui";
-import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { AddRoundModal } from "./add-round-modal";
+import { MoreHorizontal, Trash2 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { useEffect, useState } from "react";
+import { ConfirmDialog } from "../ui/confirm-dialog";
 
-interface RoundListProps {
-  rounds: Round[];
-  companyId: string;
-}
+export const RoundList = () => {
+    const { toast } = useToast();
+    const [rounds, setRounds] = useState<Round[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-export const RoundList = ({ rounds, companyId }: RoundListProps) => {
-  const router = useRouter();
+    const loadRounds = async () => {
+        try {
+            const result = await listRoundsAction();
+            
+            if (result && !result.validationErrors && !result.serverError && result.data) {
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <AddRoundModal companyId={companyId} />
-      </div>
+                setRounds(result.data);
+            }
+        } catch (error) {
+            console.error("Error loading rounds:", error);
+            toast({
+                title: "Error",
+                description: "Failed to load rounds",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-      <div className="rounded-md border">
+    useEffect(() => {
+        loadRounds();
+    }, []);
+
+    const { execute: executeDelete } = useAction(deleteRoundAction, {
+        onSuccess: () => {
+            toast({
+                title: "Round deleted",
+                description: "Round has been deleted successfully",
+                variant: "success",
+            });
+            loadRounds();
+        },
+        onError: (error) => {
+            console.error("Error deleting round:", error);
+            toast({
+                title: "Error",
+                description: error.error?.serverError || "Failed to delete round",
+                variant: "destructive",
+            });
+        },
+    });
+
+    if (isLoading) {
+        return (
+            <div className="text-center py-8 text-muted-foreground">
+                Loading rounds...
+            </div>
+        );
+    }
+
+    if (rounds.length === 0) {
+        return (
+            <div className="text-center py-8 text-muted-foreground">
+                No rounds found
+            </div>
+        );
+    }
+
+    return (
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Pre-Money Valuation</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rounds.map((round) => (
-              <TableRow key={round.id}>
-                <TableCell>{round.name}</TableCell>
-                <TableCell>{round.type}</TableCell>
-                <TableCell>${round.preMoneyValuation.toLocaleString()}</TableCell>
-                <TableCell>{new Date(round.date).toLocaleDateString()}</TableCell>
-                <TableCell>{round.status}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => 
-                          router.push(Routes.COMPANIES.ROUNDS.DETAIL(companyId, round.id))
-                        }
-                      >
-                        View Details
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Round Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Pre-Money Valuation</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {rounds.map((round) => (
+                    <TableRow key={round.id}>
+                        <TableCell>{round.company?.name || `Company ${round.companyId}`}</TableCell>
+                        <TableCell>{round.name}</TableCell>
+                        <TableCell>{round.type.replace("_", " ")}</TableCell>
+                        <TableCell>{new Date(round.date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                            ${round.preMoneyValuation.toLocaleString()}
+                        </TableCell>
+                        <TableCell>{round.status}</TableCell>
+                        <TableCell>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        className="h-8 w-8 p-0"
+                                        variant="ghost"
+                                    >
+                                        <span className="sr-only">
+                                            Open menu
+                                        </span>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                        <ConfirmDialog
+                                            title="Delete Round"
+                                            description={`Are you sure you want to delete ${round.name}? This action cannot be undone.`}
+                                            confirmText="Delete"
+                                            trigger={
+                                                <div className="w-full flex items-center text-destructive">
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Round
+                                                </div>
+                                            }
+                                            onConfirm={() => executeDelete({ id: round.id })}
+                                        />
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
         </Table>
-      </div>
-    </div>
-  );
-}; 
+    );
+};

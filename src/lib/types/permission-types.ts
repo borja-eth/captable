@@ -80,6 +80,13 @@ export enum Permissions {
     INVESTOR_CREATE = "investor:create",
     INVESTOR_UPDATE = "investor:update",
     INVESTOR_DELETE = "investor:delete",
+
+    // Stakeholder permissions
+    STAKEHOLDER_LIST = "stakeholder:list",
+    STAKEHOLDER_READ = "stakeholder:read",
+    STAKEHOLDER_CREATE = "stakeholder:create",
+    STAKEHOLDER_UPDATE = "stakeholder:update",
+    STAKEHOLDER_DELETE = "stakeholder:delete",
 }
 
 export const allPermissions = [

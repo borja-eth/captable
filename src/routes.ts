@@ -28,8 +28,10 @@ export const Routes = {
         ROUNDS: {
             LIST: (companyId: string) => `/companies/${companyId}/rounds`,
             NEW: (companyId: string) => `/companies/${companyId}/rounds/new`,
-            DETAIL: (companyId: string, roundId: string) => `/companies/${companyId}/rounds/${roundId}`,
-            EDIT: (companyId: string, roundId: string) => `/companies/${companyId}/rounds/${roundId}/edit`,
+            DETAIL: (companyId: string, roundId: string) =>
+                `/companies/${companyId}/rounds/${roundId}`,
+            EDIT: (companyId: string, roundId: string) =>
+                `/companies/${companyId}/rounds/${roundId}/edit`,
         },
     },
 } as const;

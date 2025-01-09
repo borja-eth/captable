@@ -8,130 +8,130 @@ import type { Company } from "@/lib/types/company-types";
  * Retrieves all companies from the database
  */
 export const listCompaniesQuery = async (
-  connection: DatabaseConnection = db
+    connection: DatabaseConnection = db,
 ): Promise<Company[]> => {
-  return await connection.query.companies.findMany({
-    orderBy: (companies, { desc }) => [desc(companies.createdAt)],
-  });
+    return await connection.query.companies.findMany({
+        orderBy: (companies, { desc }) => [desc(companies.createdAt)],
+    });
 };
 
 /**
  * Retrieves a company by its ID
  */
 export const getCompanyByIdQuery = async ({
-  id,
-  connection = db,
+    id,
+    connection = db,
 }: {
-  id: string;
-  connection?: DatabaseConnection;
+    id: string;
+    connection?: DatabaseConnection;
 }): Promise<Company | null> => {
-  const results = await connection.query.companies.findFirst({
-    where: eq(companies.id, id),
-  });
+    const results = await connection.query.companies.findFirst({
+        where: eq(companies.id, id),
+    });
 
-  return results ?? null;
+    return results ?? null;
 };
 
 /**
  * Creates a new company
  */
 export const createCompanyQuery = async ({
-  data,
-  connection = db,
+    data,
+    connection = db,
 }: {
-  data: Omit<Company, "id" | "createdAt" | "updatedAt">;
-  connection?: DatabaseConnection;
+    data: Omit<Company, "id" | "createdAt" | "updatedAt">;
+    connection?: DatabaseConnection;
 }): Promise<Company> => {
-  const [company] = await connection
-    .insert(companies)
-    .values({
-      ...data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning();
+    const [company] = await connection
+        .insert(companies)
+        .values({
+            ...data,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+        .returning();
 
-  return company;
+    return company;
 };
 
 /**
  * Updates an existing company
  */
 export const updateCompanyQuery = async ({
-  id,
-  data,
-  connection = db,
+    id,
+    data,
+    connection = db,
 }: {
-  id: string;
-  data: Partial<Omit<Company, "id" | "createdAt" | "updatedAt">>;
-  connection?: DatabaseConnection;
+    id: string;
+    data: Partial<Omit<Company, "id" | "createdAt" | "updatedAt">>;
+    connection?: DatabaseConnection;
 }): Promise<Company> => {
-  const [company] = await connection
-    .update(companies)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(companies.id, id))
-    .returning();
+    const [company] = await connection
+        .update(companies)
+        .set({
+            ...data,
+            updatedAt: new Date(),
+        })
+        .where(eq(companies.id, id))
+        .returning();
 
-  return company;
+    return company;
 };
 
 /**
  * Deletes a company by its ID
  */
 export const deleteCompanyQuery = async ({
-  id,
-  connection = db,
+    id,
+    connection = db,
 }: {
-  id: string;
-  connection?: DatabaseConnection;
+    id: string;
+    connection?: DatabaseConnection;
 }): Promise<Company> => {
-  const [company] = await connection
-    .delete(companies)
-    .where(eq(companies.id, id))
-    .returning();
+    const [company] = await connection
+        .delete(companies)
+        .where(eq(companies.id, id))
+        .returning();
 
-  return company;
+    return company;
 };
 
 /**
  * Checks if a company exists by ID
  */
 export const doesCompanyExistQuery = async ({
-  id,
-  connection = db,
+    id,
+    connection = db,
 }: {
-  id: string;
-  connection?: DatabaseConnection;
+    id: string;
+    connection?: DatabaseConnection;
 }): Promise<boolean> => {
-  const company = await connection.query.companies.findFirst({
-    where: eq(companies.id, id),
-    columns: {
-      id: true,
-    },
-  });
+    const company = await connection.query.companies.findFirst({
+        where: eq(companies.id, id),
+        columns: {
+            id: true,
+        },
+    });
 
-  return !!company;
+    return !!company;
 };
 
 /**
  * Checks if a company exists by registration number
  */
 export const doesCompanyExistByRegistrationQuery = async ({
-  registrationNumber,
-  connection = db,
+    registrationNumber,
+    connection = db,
 }: {
-  registrationNumber: string;
-  connection?: DatabaseConnection;
+    registrationNumber: string;
+    connection?: DatabaseConnection;
 }): Promise<boolean> => {
-  const company = await connection.query.companies.findFirst({
-    where: eq(companies.registrationNumber, registrationNumber),
-    columns: {
-      id: true,
-    },
-  });
+    const company = await connection.query.companies.findFirst({
+        where: eq(companies.registrationNumber, registrationNumber),
+        columns: {
+            id: true,
+        },
+    });
 
-  return !!company;
+    return !!company;
 };
